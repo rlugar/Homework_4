@@ -1,0 +1,63 @@
+---
+title: "Homework_4"
+author: "Rosamaria Lugara"
+date: "15/11/2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Questions:How do these mappers score alignments?
+###           What reporting options are available? 
+
+_Bowtie2_: By default the tool *score* a mismatched base as -6, a gap with a lenght -2 read is scored as (-11), a matched base as +2. An alignment to be considered "valid" must have a score that is no less than the minimum score threshold, which is self-configured. 
+** The tool has 3 distinct reporting mode:**
+1. the _default reporting mode_, which is similar to the one from many alignment tools; it is based on the search for multiple alignments and then it reports the one with the highest score;
+2. the _-k mode_, one or more alignments are searched and all of them are reported;
+3. the _-a mode_, multiple alignments are searched and are reported all possible alignments
+
+_STAR alignment tool_:
+The *alignment scoring system* is user-defined. The alignment with the highest score is chosen as the best alignment of a read. The current STAR version score mismatches and matches as +\-1. 
+Regarting the **the reporting system**, this alignment tool reports matches, mismatches, possible deletions and insertions, and splice junction gaps. The stitched combination with the highest score is chosen as the best alignment of a read. For multimapping reads, all alignments with scores below the highest one are reported.  
+
+#### _MAPPING WITH R_
+##set directory to store FASTA sequencing data
+
+```{r}
+setwd("/Users/greves/Desktop/Rosamaria")
+```
+
+
+##Extract the required library
+```{r}
+library("BSgenome.Scerevisiae.UCSC.sacCer3")
+library("Rsubread")
+```
+
+##Export sequencing data as FASTA
+```{r}
+export(BSgenome.Scerevisiae.UCSC.sacCer3, con="genome.fasta")
+```
+
+## Use of buildindex (function) for following allignement
+
+```{r}
+buildindex(basename="BSgenome.Scerevisiae.UCSC.sacCer3",reference="genome.fasta")
+```
+
+##Allign sequence reads
+```{r}
+align(index="BSgenome.Scerevisiae.UCSC.sacCer3",readfile1="/Users/greves/Desktop/Rosamaria/20170313.A-GE4_R1-sub.fastq.gz",output_file="alignResults.BAM",phredOffset=64, nthreads = 4)
+```
+
+##
+```{r}
+align(index="BSgenome.Scerevisiae.UCSC.sacCer3",readfile1="/Users/greves/Desktop/Rosamaria/20170313.A-GE4_R1-sub.fastq.gz",output_file="alignResults.BAM",phredOffset=64, nTrim5 = 5, nTrim3 = 5, nthreads=4)
+```
+
+##What are the mapping rate of the reads?
+The total of mapped reads (no trimming) is: 89.8%.
+
+##How does the mapping change if you trim 5 bases of both ends?
+Introducing the trimming of 5 bases at both ends increases slightly the number of reads mapped, passing from 89.8% to 91.5%. 
